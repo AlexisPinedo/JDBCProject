@@ -1,4 +1,3 @@
-//test
 package cecs323.jdbc.project;
 import java.sql.*;
 import java.util.Scanner;
@@ -7,9 +6,9 @@ import java.util.Scanner;
  * @author Kishen
  */
 public class CECS323JDBCProject {
-static String USER;
-    static String PASS;
-    static String DBNAME;
+static String USER = "k";
+    static String PASS = "k";
+    static String DBNAME = "JDBCProject";
     //This is the specification for the printout that I'm doing:
     //each % denotes the start of a new field.
     //The - denotes left justification.
@@ -17,10 +16,9 @@ static String USER;
     //The "s" denotes that it's a string.  All of our output in this test are 
     //strings, but that won't always be the case.
     static final String displayFormat="%-30s%-50s%-30s%-30s%-30s\n";
-// JDBC driver name and database URL
-    static final String JDBC_DRIVER = "org.apache.derby.jdbc.ClientDriver";
-    static String DB_URL = "jdbc:derby://localhost:1527/";
-//            + "testdb;user=";
+    static final String JDBC_DRIVER = "org.apache.derby.jdbc.ClientDriver" ;
+    static String DB_URL = "jdbc:derby://localhost:1527/" + DBNAME + ";user="
+            + USER + ";password=" + PASS;
 /**
  * Takes the input string and outputs "N/A" if the string is empty or null.
  * @param input The string to be mapped.
@@ -37,16 +35,10 @@ static String USER;
     
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
-        //Prompt the user for the database name, and the credentials.
-        //If your database has no credentials, you can update this code to 
-        //remove that from the connection string.
-        DBNAME = "JDBCProject";
-        USER = "k";
-        PASS = "k";
-        //Constructing the database URL connection string
-        DB_URL = DB_URL + DBNAME + ";user="+ USER + ";password=" + PASS;
+  
         Connection conn = null; //initialize the connection
         Statement stmt = null;  //initialize the statement that we're using
+        
         try {
             //STEP 2: Register JDBC driver
             Class.forName("org.apache.derby.jdbc.ClientDriver");
@@ -58,11 +50,11 @@ static String USER;
             int choice = 0;
              do{
                     // Menu options
-                    System.out.println("1.  List a table");
-                    System.out.println("2.  List specific data from a table");
-                    System.out.println("3.  Insert information into a table");
-                    System.out.println("4.  Remove a book");
-                    System.out.println("5.  Quit\n");
+                    System.out.println("1. List all names from a table");
+                    System.out.println("2. List info about specific entries");
+                    System.out.println("3. Insert information into a table");
+                    System.out.println("4. Remove a book");
+                    System.out.println("5. Quit\n");
                     choice = in.nextInt();
 
                     // Checks whether the user's input matches is of the desired type
@@ -77,11 +69,72 @@ static String USER;
                      switch(choice){
                          
                          case 1:
-                             System.out.println("hello1");
+                             //User chooses which table to display names from
+                            System.out.println("Which tables names would you like to display?");
+                            System.out.println("1. Books");
+                            System.out.println("2. Publishers");
+                            System.out.println("3. Writing Groups");
+                            
+                            int tableChoice = in.nextInt();
+                             while (tableChoice < 1 || tableChoice > 3){
+                                System.out.println("Please enter 1, 2, or 3 \n");
+                                tableChoice = in.nextInt();
+                            }
+                    switch (tableChoice) {
+                        case 1:
+                            stmt = conn.createStatement();
+                            String bookSql;
+                            bookSql = "SELECT bookTitle FROM Book";
+                            ResultSet bookRs = stmt.executeQuery(bookSql);
+                            System.out.println("Book Title");
+                            while (bookRs.next()) {
+                                String bookTitle = bookRs.getString("bookTitle");
+                                System.out.println(dispNull(bookTitle));
+                            }
+                            System.out.println(" ");
+                            bookRs.close();
+                            break;
+                        case 2:
+                            stmt = conn.createStatement();
+                            String publisherSql;
+                            publisherSql = "SELECT publisherName FROM Publisher";
+                            ResultSet publisherRs = stmt.executeQuery(publisherSql);
+                            System.out.println("Publisher Name");
+                            while (publisherRs.next()) {
+                                String publisherName = publisherRs.getString("publisherName");
+                                System.out.println(dispNull(publisherName));
+                            }
+                            System.out.println(" ");
+                            publisherRs.close();
+                            break;
+                        case 3:
+                              stmt = conn.createStatement();
+                            String writingGroupSql;
+                            writingGroupSql = "SELECT groupName FROM WritingGroup";
+                            ResultSet writingGroupRs = stmt.executeQuery(writingGroupSql);
+                            System.out.println("Writing Group");
+                            while (writingGroupRs.next()) {
+                                String groupName = writingGroupRs.getString("groupName");
+                                System.out.println(dispNull(groupName));
+                            }
+                            System.out.println(" ");
+                            writingGroupRs.close();
+                            break;
+                    }
+
                              break;
                              
                         case 2:
-                             System.out.println("hello2");
+                            System.out.println("Which tables would you like to draw information from?");
+                            System.out.println("1. Books");
+                            System.out.println("2. Publishers");
+                            System.out.println("3. Writing Groups");
+                            
+                            int infoChoice = in.nextInt();
+                             while (infoChoice < 1 || infoChoice > 3){
+                                System.out.println("Please enter 1, 2, or 3 \n");
+                                infoChoice = in.nextInt();
+                            }
                              break;
                              
                         case 3:
