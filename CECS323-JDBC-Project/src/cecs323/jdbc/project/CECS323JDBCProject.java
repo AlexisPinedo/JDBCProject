@@ -76,12 +76,14 @@ static String USER = "k";
                             System.out.println("2. Publishers");
                             System.out.println("3. Writing Groups");
                             
+                            //in case user enters any number besides 1, 2, or 3
                             int tableChoice = in.nextInt();
                              while (tableChoice < 1 || tableChoice > 3){
                                 System.out.println("Please enter 1, 2, or 3 \n");
                                 tableChoice = in.nextInt();
                             }
                     switch (tableChoice) {
+                        //book titles from book table are displayed
                         case 1:
                             stmt = conn.createStatement();
                             String bookSql;
@@ -96,6 +98,7 @@ static String USER = "k";
                             bookRs.close();
                             break;
                         case 2:
+                            //publisher names from publisher table are displayed
                             stmt = conn.createStatement();
                             String publisherSql;
                             publisherSql = "SELECT publisherName FROM Publisher";
@@ -109,7 +112,8 @@ static String USER = "k";
                             publisherRs.close();
                             break;
                         case 3:
-                              stmt = conn.createStatement();
+                            //writing group names from writing group table are displayed
+                            stmt = conn.createStatement();
                             String writingGroupSql;
                             writingGroupSql = "SELECT groupName FROM WritingGroup";
                             ResultSet writingGroupRs = stmt.executeQuery(writingGroupSql);
@@ -127,8 +131,11 @@ static String USER = "k";
                              
                         case 2:
                             String sql;
+                            //if the input(s) is/are not found, then this will remain false and
+                            //the user will know that their entry is not in the table
+                            boolean isFound = false;
                             
-                            
+                            //Table to draw information from is chosen
                             System.out.println("Which tables would you like to draw information from?");
                             System.out.println("1. Books");
                             System.out.println("2. Publishers");
@@ -136,6 +143,7 @@ static String USER = "k";
                             
                             int infoChoice = in.nextInt();
                             
+                            //validation that the number is 1, 2, or 3
                              while (infoChoice < 1 || infoChoice > 3){
                                 System.out.println("Please enter 1, 2, or 3 \n");
                                 infoChoice = in.nextInt();
@@ -143,6 +151,7 @@ static String USER = "k";
                              in.nextLine();
                              
                              switch(infoChoice){
+                                 //user enters book name, and writing group to obtain info about book
                                  case 1:
                                     stmt = conn.createStatement();
                                     System.out.println("Please enter the title of the book");
@@ -156,15 +165,18 @@ static String USER = "k";
                                     while (enteredGroup.equals("N/A")){
                                         System.out.println("Please enter a valid writing group \n");
                                         enteredGroup = dispNull(in.nextLine());
-                            }
-
-                                    
-//                                    System.out.println( "Please enter the writing group for the book" );
-//                                    enteredGroup = dispNull(in.nextLine());
-                                    
+                                    }
+                                    //prepared statement creation
                                     sql= "SELECT groupName, bookTitle, publisherName, yearPublished, numberPages FROM Book"
-                                            + " WHERE bookTitle =" + "\'" + enteredTitle +"\'" +"AND groupName="+ "\'" + enteredGroup +"\'";
-                                     rs = stmt.executeQuery(sql);
+                                            + " WHERE bookTitle = ? AND groupName = ?";
+                                    PreparedStatement pstmt = conn.prepareStatement(sql);
+                                    
+                                    //the title and group name are set for the query
+                                    pstmt.setString(1,enteredTitle);
+                                    pstmt.setString(2,enteredGroup);
+                                    //query to search is executed for the prepared statement
+                                     rs = pstmt.executeQuery();
+                                     //formatting is displayed whether or not the information is found
                                     System.out.printf(displayFormat, "Group Name", "Book Title", "Publisher Name", "Year", "Number of Pages");
                                     while (rs.next()) {
                                         //Retrieve by column name
@@ -173,11 +185,22 @@ static String USER = "k";
                                         String publisherName = rs.getString("publisherName");
                                         int yearPublished = rs.getInt("yearPublished");
                                         int numberPages = rs.getInt("numberPages");
-
+                                        
+                                        if(bookTitle.equals(enteredTitle) && groupName.equals(enteredGroup)){
+                                            isFound = true;
+                                        }
                                         //Display values
                                         System.out.printf(displayFormat, 
                                                 dispNull(groupName), dispNull(bookTitle), dispNull(publisherName), yearPublished, numberPages);
                                     }
+                                    //in case the entered information is not matching anything in the database,
+                                    //this is displayed
+                                    if(isFound == false){
+                                        System.out.println("Either the book title, " + enteredTitle 
+                                                + ", the associated writing group, " + enteredGroup 
+                                                + ", or a combination of the two were not found in the database");
+                                    }
+                                    
                                     
            
                                      break;
