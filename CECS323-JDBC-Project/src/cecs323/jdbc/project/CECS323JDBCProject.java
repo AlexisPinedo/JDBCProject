@@ -302,20 +302,200 @@ static String USER = "k";
                              break;
                              
                         case 3:
+                             
                              //Table to add information into is selected
                             System.out.println("Which table would you like to add information into?");
                             System.out.println("1. Books");
                             System.out.println("2. Publishers");
                             System.out.println("3. Writing Groups");
-                            
+                            in.nextLine();
                             int insertChoice = in.nextInt();
-                            
+                            stmt = conn.createStatement();
+                            String groupName;
+                            String bookTitle;
+                            String publisherName;
+                            String yearPublished;
+                            String numberPages;
+                            boolean matchingGroupName = false;
+                            boolean matchingPubName = false;
                             switch(insertChoice){
                                 case 1:
+                                    
+                                    System.out.println("Please enter the writers group name");
+                                    groupName = in.next();
+                                    groupName += in.nextLine();
+                                    stmt = conn.createStatement();
+                                    String writingGroupSql;
+                                    writingGroupSql = "SELECT groupName FROM WritingGroup";
+                                    ResultSet writingGroupRs = stmt.executeQuery(writingGroupSql);
+                                    while (writingGroupRs.next()) {
+                                        String WritegroupName = writingGroupRs.getString("groupName");
+                                        if(WritegroupName.equals(groupName))
+                                        {
+                                            matchingGroupName = true;
+                                            break;
+                                        }
+                                        else
+                                            matchingGroupName = false;
+                                    }
+                                    if(matchingGroupName){}
+                                        
+                                    else{
+                                        System.out.println("incorrect group name Returning to Main Menu");
+                                        break;
+                                    }
+                                    writingGroupRs.close();
+                                    
+                                    System.out.println("Please enter the title of the book");
+                                    bookTitle = in.next();
+                                    bookTitle += in.nextLine();
+                                    
+                                    System.out.println("Please enter publisher name");
+                                    publisherName = in.next();
+                                    publisherName += in.nextLine();
+                                    stmt = conn.createStatement();
+                                    String publisherSql;
+                                    publisherSql = "SELECT publisherName FROM Publisher";
+                                    ResultSet publisherRs = stmt.executeQuery(publisherSql);
+                                    while (publisherRs.next()) {
+                                        String publisherGroupName = publisherRs.getString("publisherName");
+                                        if(publisherGroupName.equals(publisherName))
+                                        {
+                                            matchingPubName = true;
+                                            break;
+                                        }
+                                        else
+                                            matchingPubName = false;
+                                    }
+                                    if(matchingPubName) {}
+                                    else{
+                                        System.out.println("incorrect publisher name Returning to Main Menu");
+                                        break;
+                                    }
+                                    publisherRs.close();
+                                    
+                                    System.out.println("Please enter the publication year");
+                                    yearPublished = in.next();
+                                    yearPublished += in.nextLine();
+                                    System.out.println("Please enter the number of pages");
+                                    numberPages = in.next();
+                                    numberPages += in.nextLine();
+                                    sql= "INSERT INTO Book (groupName,bookTitle ,publisherName ,yearPublished, numberPages) VALUES ('"
+                                             + groupName + "', '" + bookTitle + "', '" + publisherName + "', '" + 
+                                            yearPublished + "', '" + numberPages + "')";
+                                    System.out.println(sql);
+                                    stmt = conn.createStatement();
+                                    stmt.executeUpdate(sql);
+                                  
                                     break;
+                                    
                                 case 2:
+                                    String publisherAddress;
+                                    String publisherPhone;
+                                    String publisherEmail;
+                                    
+                                    
+                                    System.out.println("Please enter the name of the publisher");
+                                    publisherName = in.next();
+                                    publisherName += in.nextLine();
+                                    stmt = conn.createStatement();
+                                    publisherSql = "SELECT publisherName FROM Publisher";
+                                    publisherRs = stmt.executeQuery(publisherSql);
+                                    while (publisherRs.next()) {
+                                        String publisherGroupName = publisherRs.getString("publisherName");
+                                        if(publisherGroupName.equals(publisherName))
+                                        {
+                                            matchingPubName = true;
+                                            break;
+                                        }
+                                        else
+                                            matchingPubName = false;
+                                    }
+                                    publisherRs.close();
+                                    if(matchingPubName) {
+                                    System.out.println("Matching publisher name Returning to Main Menu");
+                                        break;}
+                                    
+                                    
+                                    System.out.println("Please enter the publication Address");
+                                    publisherAddress = in.next();
+                                    publisherAddress += in.nextLine();
+                                    
+                                    System.out.println("Please enter the publisher phone number");
+                                    publisherPhone = in.next();
+                                    publisherPhone += in.nextLine();
+                                    
+                                    System.out.println("Please enter the publisher email");
+                                    publisherEmail = in.next();
+                                    publisherEmail += in.nextLine();
+                                    
+                                    sql= "INSERT INTO Publisher (publisherName, publisherAddress, publisherPhone, publisherEmail) VALUES ('"
+                                             + publisherName + "', '" + publisherAddress + "', '" + publisherPhone + "', '" + 
+                                            publisherEmail + "')";
+                                    //System.out.println(sql);
+                                    stmt = conn.createStatement();
+                                    stmt.executeUpdate(sql);
+                                    
+                                    
+                                    System.out.println("Would you like to update an old publisher with the new publisher?\n1)yes\nAnything else) no\n");
+                                    int response = in.nextInt();
+                                    if(response == 1)
+                                    {
+                                        System.out.println("Please enter the name of the OLD publisher");
+                                        String OldpublisherName = in.next();
+                                        OldpublisherName += in.nextLine();
+                                        stmt = conn.createStatement();
+                                        publisherSql = "Update Book SET publisherName = '" + publisherName + "' WHERE publisherName = '" +
+                                                OldpublisherName + "'";
+                                        stmt.executeUpdate(publisherSql);
+                                        System.out.println("Finished updating");
+                                    }
+       
                                     break;
                                 case 3:
+                                    String headWriter;
+                                    String yearFormed;
+                                    String subject;
+                                    
+                                    System.out.println("Please enter the name of the group");
+                                    groupName = in.next();
+                                    groupName += in.nextLine();
+                                    stmt = conn.createStatement();
+                                    publisherSql = "SELECT groupName FROM WRITINGGROUP";
+                                    publisherRs = stmt.executeQuery(publisherSql);
+                                    while (publisherRs.next()) {
+                                        String WritingGroupName = publisherRs.getString("groupName");
+                                        if(WritingGroupName.equals(groupName))
+                                        {
+                                            matchingGroupName = true;
+                                            break;
+                                        }
+                                        else
+                                            matchingGroupName = false;
+                                    }
+                                    publisherRs.close();
+                                    if(matchingGroupName) {
+                                    System.out.println("Matching Group name Returning to Main Menu");
+                                        break;}
+                                    
+                                    System.out.println("Please enter the head writer");
+                                    headWriter = in.next();
+                                    headWriter += in.nextLine();
+                                    
+                                    System.out.println("Please enter the year formed");
+                                    yearFormed = in.next();
+                                    yearFormed += in.nextLine();
+                                    
+                                    System.out.println("Please enter the subject");
+                                    subject = in.next();
+                                    subject += in.nextLine();
+                                    
+                                    sql= "INSERT INTO WRITINGGROUP (groupName,headWriter,yearFormed,subject) VALUES ('"
+                                             + groupName + "', '" + headWriter + "', '" + yearFormed + "', '" + 
+                                            subject + "')";
+                                    //System.out.println(sql);
+                                    stmt = conn.createStatement();
+                                    stmt.executeUpdate(sql);
                                     break;
                             }
                         
@@ -344,31 +524,29 @@ static String USER = "k";
                                     stmt = conn.createStatement();
                                     //sql for query on group name and book title
                                     String removeSearchSql= "SELECT groupName, bookTitle"
-                                            + "FROM Book ";
+                                            + " FROM Book ";
+                                    System.out.println("finished getting valus and did search");
 
                                     //execution of query
                                     rs = stmt.executeQuery(removeSearchSql);
                                     while (rs.next()) {
                                         //Retrieve by column name
-                                        String groupName = rs.getString("groupName");
-                                        String bookTitle = rs.getString("bookTitle");
+                                        groupName = rs.getString("groupName");
+                                        bookTitle = rs.getString("bookTitle");
                                         
-                                    if(bookTitle.equals(removeTitle) && groupName.equals(removeGroup)){
+                                        if(bookTitle.equals(removeTitle) && groupName.equals(removeGroup)){
+                                            System.out.println("FOUND BOOK");
                                             removeFound = true;
+                                            break;
                                         }
                                     }
                                     if(removeFound==true){
                                         String deleteBookSql= "DELETE"
                                                 + " FROM Book"
-                                                + " WHERE bookTitle = ? AND groupName = ?";
-                                        PreparedStatement pstmt = conn.prepareStatement(deleteBookSql);
-
-                                        //the title and group name are set for the query
-                                        pstmt.setString(1,removeTitle);
-                                        pstmt.setString(2,removeGroup);
-                                        //delete query is executed
-                                        pstmt.executeUpdate();
-                                    }
+                                                + " WHERE bookTitle ='" + removeTitle +"' AND groupName ='" + removeGroup +"'";
+                                        System.out.println(deleteBookSql);
+                                        stmt.executeUpdate(deleteBookSql);
+                                  }
                                     else{
                                         System.out.println("Either the book title, " + removeTitle 
                                                 + ", the associated writing group, " + removeGroup 
