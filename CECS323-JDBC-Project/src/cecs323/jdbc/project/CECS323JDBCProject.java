@@ -15,7 +15,8 @@ static String USER = "k";
     //The number indicates how wide to make the field.
     //The "s" denotes that it's a string.  All of our output in this test are 
     //strings, but that won't always be the case.
-    static final String displayFormat="%-30s%-50s%-30s%-30s%-30s\n";
+    static final String displayFormat="%-30s%-45s%-30s%-20s%-20s%-30s%-30s%-30s%-30s%-30s%-30s\n";
+    static final String displayFormat2="%-30s%-30s%-30s%-30s\n";
     static final String JDBC_DRIVER = "org.apache.derby.jdbc.ClientDriver" ;
     static String DB_URL = "jdbc:derby://localhost:1527/" + DBNAME + ";user="
             + USER + ";password=" + PASS;
@@ -153,7 +154,6 @@ static String USER = "k";
                              switch(infoChoice){
                                  //user enters book name, and writing group to obtain info about book
                                  case 1:
-                                    stmt = conn.createStatement();
                                     System.out.println("Please enter the title of the book");
                                     String enteredTitle = dispNull(in.nextLine());
                                     while (enteredTitle.equals("N/A")){
@@ -167,7 +167,8 @@ static String USER = "k";
                                         enteredGroup = dispNull(in.nextLine());
                                     }
                                     //prepared statement creation
-                                    sql= "SELECT groupName, bookTitle, publisherName, yearPublished, numberPages FROM Book"
+                                    sql= "SELECT groupName, bookTitle, publisherName, yearPublished, numberPages, publisherAddress, publisherPhone, publisherEmail headWriter, yearFormed, subject "
+                                            + "FROM Book NATURAL JOIN Publisher NATURAL JOIN WritingGroup"
                                             + " WHERE bookTitle = ? AND groupName = ?";
                                     PreparedStatement pstmt = conn.prepareStatement(sql);
                                     
@@ -176,22 +177,33 @@ static String USER = "k";
                                     pstmt.setString(2,enteredGroup);
                                     //query to search is executed for the prepared statement
                                      rs = pstmt.executeQuery();
-                                     //formatting is displayed whether or not the information is found
-                                    System.out.printf(displayFormat, "Group Name", "Book Title", "Publisher Name", "Year", "Number of Pages");
+                                     
+                                     System.out.println();
+                                     //formatting for headers is displayed
+                                    System.out.printf(displayFormat, "Group Name", "Book Title", "Publisher Name", "Year", "Number of Pages", "Publisher Address", "Publisher Phone", "Publisher Email", "Head Writer", "Year Formed", "Subject");
                                     while (rs.next()) {
                                         //Retrieve by column name
                                         String groupName = rs.getString("groupName");
                                         String bookTitle = rs.getString("bookTitle");
                                         String publisherName = rs.getString("publisherName");
-                                        int yearPublished = rs.getInt("yearPublished");
-                                        int numberPages = rs.getInt("numberPages");
+                                        String yearPublished = rs.getString("yearPublished");
+                                        String numberPages = rs.getString("numberPages");
+                                        String publisherAddress = rs.getString("publisherAddress");
+                                        String publisherPhone = rs.getString("publisherPhone");
+                                        String publisherEmail = rs.getString("publisherEmail");
+                                        String headWriter = rs.getString("headWriter");
+                                        String yearFormed = rs.getString("yearFormed");
+                                        String subject = rs.getString("subject");
+                                        
                                         
                                         if(bookTitle.equals(enteredTitle) && groupName.equals(enteredGroup)){
                                             isFound = true;
                                         }
                                         //Display values
                                         System.out.printf(displayFormat, 
-                                                dispNull(groupName), dispNull(bookTitle), dispNull(publisherName), yearPublished, numberPages);
+                                                dispNull(groupName), dispNull(bookTitle), dispNull(publisherName), dispNull(yearPublished)
+                                                ,dispNull(numberPages), dispNull(publisherAddress), dispNull(publisherPhone),dispNull(publisherEmail)
+                                                ,dispNull(headWriter),dispNull(yearFormed),dispNull(subject));
                                     }
                                     //in case the entered information is not matching anything in the database,
                                     //this is displayed
@@ -200,24 +212,171 @@ static String USER = "k";
                                                 + ", the associated writing group, " + enteredGroup 
                                                 + ", or a combination of the two were not found in the database");
                                     }
-                                    
-                                    
-           
-                                     break;
+                                    System.out.println();
+                                    break;
                                  case 2:
+                                    System.out.println("Please enter the publisher name");
+                                    String enteredPublisher = dispNull(in.nextLine());
+                                    while (enteredPublisher.equals("N/A")){
+                                        System.out.println("Please enter a valid publisher \n");
+                                        enteredPublisher = dispNull(in.nextLine());
+                            }
+                                    //prepared statement creation
+                                    sql= "SELECT publisherName, publisherAddress, publisherPhone, publisherEmail FROM Publisher"
+                                            + " WHERE publisherName = ?";
+                                    pstmt = conn.prepareStatement(sql);
+                                    
+                                    //the publisher is set for the query
+                                    pstmt.setString(1,enteredPublisher);
+                                    //query to search is executed for the prepared statement
+                                     rs = pstmt.executeQuery();
+                                     
+                                     System.out.println();
+                                     //formatting for headers is displayed 
+                                    System.out.printf(displayFormat2, "Publisher Name", "Publisher Address", "Publisher Phone", "Publisher Email");
+                                    while (rs.next()) {
+                                        //Retrieve by column name
+                                        String publisherName = rs.getString("publisherName");
+                                        String publisherAddress = rs.getString("publisherAddress");
+                                        String publisherPhone = rs.getString("publisherPhone");
+                                        String publisherEmail = rs.getString("publisherEmail");
+                                        
+                                        if(publisherName.equals(enteredPublisher)){
+                                            isFound = true;
+                                        }
+                                        //Display values
+                                        System.out.printf(displayFormat2, 
+                                                dispNull(publisherName), dispNull(publisherAddress), dispNull(publisherPhone), dispNull(publisherEmail));
+                                    }
+                                    //in case the entered information is not matching anything in the database,
+                                    //this is displayed
+                                    if(isFound == false){
+                                        System.out.println("The publisher name, " + enteredPublisher + ", was not found in the database");
+                                    }
+                                    System.out.println();
                                      break;
                                  case 3:
+                                    System.out.println("Please enter the writing group");
+                                    enteredGroup = dispNull(in.nextLine());
+                                    
+                                    while (enteredGroup.equals("N/A")){
+                                        System.out.println("Please enter a valid writing group \n");
+                                        enteredGroup = dispNull(in.nextLine());
+                            }
+                                    //prepared statement creation
+                                    sql= "SELECT groupName, headWriter, yearFormed, subject FROM WritingGroup"
+                                            + " WHERE groupName = ?";
+                                    pstmt = conn.prepareStatement(sql);
+                                    
+                                    //the group name is set for the query
+                                    pstmt.setString(1,enteredGroup);
+                                    //query to search is executed for the prepared statement
+                                     rs = pstmt.executeQuery();
+                                
+                                    System.out.println();
+                                    //formatting for header is displayed
+                                    System.out.printf(displayFormat2, "Group Name", "Head Writer", "Year Formed", "Subject");
+                                    while (rs.next()) {
+                                        //Retrieve by column name
+                                        String groupName = rs.getString("groupName");
+                                        String headWriter = rs.getString("headWriter");
+                                        String yearFormed = rs.getString("yearFormed");
+                                        String subject = rs.getString("subject");
+                                        
+                                        if(groupName.equals(enteredGroup)){
+                                            isFound = true;
+                                        }
+                                        //Display values
+                                        System.out.printf(displayFormat2, 
+                                                dispNull(groupName), dispNull(headWriter), dispNull(yearFormed), dispNull(subject));
+                                    }
+                                    //in case the entered information is not matching anything in the database,
+                                    //this is displayed
+                                    if(isFound == false){
+                                        System.out.println("The writing group, " + enteredGroup + ", was not found in the database");
+                                    }
+                                    System.out.println();
                                      break; 
                              }
                              
                              break;
                              
                         case 3:
-                             System.out.println("hello3");
+                             //Table to add information into is selected
+                            System.out.println("Which table would you like to add information into?");
+                            System.out.println("1. Books");
+                            System.out.println("2. Publishers");
+                            System.out.println("3. Writing Groups");
+                            
+                            int insertChoice = in.nextInt();
+                            
+                            switch(insertChoice){
+                                case 1:
+                                    break;
+                                case 2:
+                                    break;
+                                case 3:
+                                    break;
+                            }
+                        
                              break;
                              
                         case 4:
-                             System.out.println("hello4");
+                            //used to clear space that comes from the in.nextInt() from previous menu
+                            in.nextLine();
+                            //used as a flag to make sure that the entered information is in the database
+                            boolean removeFound = false;
+                            //title request
+                             System.out.println("Please enter the title of the book you would like to remove");
+                                    //makes sure input is valid
+                                    String removeTitle = dispNull(in.nextLine());
+                                    while (removeTitle.equals("N/A")){
+                                        System.out.println("Please enter a valid title \n");
+                                        removeTitle = dispNull(in.nextLine());
+                            }
+                                    System.out.println("Please enter the writing group for the book");
+                                    String removeGroup = dispNull(in.nextLine());
+                                    while (removeGroup.equals("N/A")){
+                                        System.out.println("Please enter a valid writing group \n");
+                                        removeGroup = dispNull(in.nextLine());
+                                    }
+                                    
+                                    stmt = conn.createStatement();
+                                    //sql for query on group name and book title
+                                    String removeSearchSql= "SELECT groupName, bookTitle"
+                                            + "FROM Book ";
+
+                                    //execution of query
+                                    rs = stmt.executeQuery(removeSearchSql);
+                                    while (rs.next()) {
+                                        //Retrieve by column name
+                                        String groupName = rs.getString("groupName");
+                                        String bookTitle = rs.getString("bookTitle");
+                                        
+                                    if(bookTitle.equals(removeTitle) && groupName.equals(removeGroup)){
+                                            removeFound = true;
+                                        }
+                                    }
+                                    if(removeFound==true){
+                                        String deleteBookSql= "DELETE"
+                                                + " FROM Book"
+                                                + " WHERE bookTitle = ? AND groupName = ?";
+                                        PreparedStatement pstmt = conn.prepareStatement(deleteBookSql);
+
+                                        //the title and group name are set for the query
+                                        pstmt.setString(1,removeTitle);
+                                        pstmt.setString(2,removeGroup);
+                                        //delete query is executed
+                                        pstmt.executeUpdate();
+                                    }
+                                    else{
+                                        System.out.println("Either the book title, " + removeTitle 
+                                                + ", the associated writing group, " + removeGroup 
+                                                + ", or a combination of the two were not found in the database");
+                                    }
+                                    System.out.println();
+                                     
+                                     System.out.println();
                              break;
                              
                         case 5:
@@ -227,10 +386,10 @@ static String USER = "k";
              } while(run!=false);
 
             //STEP 4: Execute a query
-            System.out.println("Creating statement...");
-            stmt = conn.createStatement();
-            String sql;
-            sql = "SELECT groupName, bookTitle, publisherName, yearPublished, numberPages FROM Book";
+//            System.out.println("Creating statement...");
+//            stmt = conn.createStatement();
+//            String sql;
+//            sql = "SELECT groupName, bookTitle, publisherName, yearPublished, numberPages FROM Book";
 //            ResultSet rs = stmt.executeQuery(sql);
 //
 //            //STEP 5: Extract data from result set
